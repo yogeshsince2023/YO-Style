@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import type { ExtendedFashionProfile } from '../../types/auth';
-import { User, Shield, Download, Trash2, Check, RefreshCw, Sliders, Tag, Palette } from 'lucide-react';
-
 import type { WardrobeItem } from '../../types/fashion';
+import { calculateSizeGuidance, computeWardrobeAnalytics } from '../../utils/advancedStyling';
+import { User, Shield, Download, Trash2, Check, RefreshCw, Sliders, Tag, Palette, Ruler, BarChart2, Heart, AlertTriangle } from 'lucide-react';
 
 interface ProfileViewProps {
   profile: ExtendedFashionProfile;
@@ -308,6 +308,109 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           )}
         </button>
       </form>
+
+      {/* TIER 1: Personalized Brand Size Guidance */}
+      {(() => {
+        const sizeGuidances = calculateSizeGuidance({
+          chestInches: 40,
+          waistInches: 32,
+          fitPreference: profile.preferredFits[0] || 'relaxed'
+        });
+
+        return (
+          <div className="editorial-card" style={{ padding: '20px', marginBottom: '18px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <h3 style={{ fontSize: '15px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                <Ruler size={16} /> Personalized Brand Size Guidance
+              </h3>
+              <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--ink-secondary)' }}>
+                Based on Style DNA
+              </span>
+            </div>
+
+            <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', padding: '8px 10px', fontSize: '11px', color: '#92400E', marginBottom: '12px', lineHeight: 1.4 }}>
+              <strong>Non-Guarantee Notice:</strong> {sizeGuidances[0].disclaimer}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+              {sizeGuidances.map((sg, idx) => (
+                <div key={idx} style={{ background: 'var(--bg-warm-light)', border: '1px solid var(--border-hairline)', padding: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 800 }}>{sg.brandName}</span>
+                    <span style={{ fontSize: '13px', fontWeight: 900, color: 'var(--ink-primary)', background: '#FFFFFF', padding: '1px 6px', border: '1px solid var(--border-hairline)' }}>
+                      Size {sg.recommendedSize}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '10px', color: 'var(--ink-muted)', marginBottom: '4px' }}>{sg.category}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--ink-secondary)', lineHeight: 1.35 }}>{sg.fitNote}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* TIER 1: Deep Wardrobe Analytics & Cost-per-Wear */}
+      {(() => {
+        const analytics = computeWardrobeAnalytics(wardrobe);
+
+        return (
+          <div className="editorial-card" style={{ padding: '20px', marginBottom: '18px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+              <BarChart2 size={16} /> Wardrobe Analytics & Cost-per-Wear
+            </h3>
+
+            {/* Metrics Overview */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '16px' }}>
+              <div style={{ background: 'var(--bg-warm-light)', padding: '10px', border: '1px solid var(--border-hairline)', textAlign: 'center' }}>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--ink-secondary)', textTransform: 'uppercase' }}>Est. Vault Value</div>
+                <div style={{ fontSize: '16px', fontWeight: 900, marginTop: '2px' }}>₹{analytics.totalEstimatedValueInr.toLocaleString('en-IN')}</div>
+              </div>
+
+              <div style={{ background: 'var(--bg-warm-light)', padding: '10px', border: '1px solid var(--border-hairline)', textAlign: 'center' }}>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--ink-secondary)', textTransform: 'uppercase' }}>Avg. Cost/Wear</div>
+                <div style={{ fontSize: '16px', fontWeight: 900, marginTop: '2px' }}>₹{analytics.averageCostPerWearInr.toLocaleString('en-IN')}</div>
+              </div>
+
+              <div style={{ background: 'var(--bg-warm-light)', padding: '10px', border: '1px solid var(--border-hairline)', textAlign: 'center' }}>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--ink-secondary)', textTransform: 'uppercase' }}>Avg. Wears/Piece</div>
+                <div style={{ fontSize: '16px', fontWeight: 900, marginTop: '2px' }}>{analytics.averageWearCount}x</div>
+              </div>
+            </div>
+
+            {/* Top Loved Staples */}
+            {analytics.topLovedItems.length > 0 && (
+              <div style={{ marginBottom: '14px' }}>
+                <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--ink-muted)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Heart size={12} color="#B23A2B" fill="#B23A2B" /> Most Loved Staples (Highest Wear Return):
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {analytics.topLovedItems.map(item => (
+                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', background: '#FFFFFF', border: '1px solid var(--border-hairline)', fontSize: '12px' }}>
+                      <span style={{ fontWeight: 700 }}>{item.name}</span>
+                      <span style={{ fontWeight: 800, color: '#2E7D32' }}>{item.wearCount} wears</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Dormant Items Alert */}
+            {analytics.dormantItems.length > 0 && (
+              <div style={{ background: '#FFF8E1', border: '1px solid #FFE082', padding: '10px', fontSize: '11px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 800, color: '#F57F17', marginBottom: '2px' }}>
+                  <AlertTriangle size={13} />
+                  <span>DORMANT PIECES ALERT ({analytics.dormantItems.length} items unworn)</span>
+                </div>
+                <div style={{ color: 'var(--ink-secondary)', lineHeight: 1.4 }}>
+                  {analytics.dormantItems.slice(0, 3).map(i => i.name).join(', ')}
+                  {analytics.dormantItems.length > 3 && ` and ${analytics.dormantItems.length - 3} others`} have 0 or 1 logged wear. Plan them in your weekly schedule!
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Live Storage Usage Monitor */}
       <div className="editorial-card" style={{ padding: '16px', background: '#FFFFFF', marginBottom: '18px' }}>

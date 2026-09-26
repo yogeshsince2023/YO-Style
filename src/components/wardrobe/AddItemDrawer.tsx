@@ -1,7 +1,9 @@
 import React, { useState, useRef } from 'react';
 import type { WardrobeItem, FashionCategory, Subcategory, OccasionType, FitType, PatternType } from '../../types/fashion';
+import type { ImageClassificationResult } from '../../types/intelligence';
 import { compressWardrobeImage } from '../../utils/imageCompressor';
-import { Plus, Check, Upload, X, Shield, Image as ImageIcon } from 'lucide-react';
+import { analyzeClothingImage } from '../../utils/wardrobeIntelligence';
+import { Plus, Check, Upload, X, Shield, Image as ImageIcon, Sparkles, RefreshCw } from 'lucide-react';
 
 interface AddItemDrawerProps {
   isOpen: boolean;
@@ -65,7 +67,33 @@ export const AddItemDrawer: React.FC<AddItemDrawerProps> = ({
   const [imageError, setImageError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // On-demand image classification state
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [classificationResult, setClassificationResult] = useState<ImageClassificationResult | null>(null);
+
   if (!isOpen) return null;
+
+  const handleAnalyzePhoto = async () => {
+    if (!imagePreview || isAnalyzing) return;
+    setIsAnalyzing(true);
+    try {
+      const res = await analyzeClothingImage(imagePreview);
+      setClassificationResult(res);
+      setCategory(res.suggestedCategory);
+      setSubCategoryLabel(res.suggestedSubcategoryLabel);
+      setPrimaryColor(res.suggestedColorHex);
+      setColorName(res.suggestedColorName);
+      setFabric(res.suggestedFabric);
+      setFit(res.suggestedFit);
+      if (!name.trim()) {
+        setName(`${res.suggestedColorName} ${res.suggestedSubcategoryLabel}`);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleToggleOccasion = (occ: OccasionType) => {
     setSelectedOccasions(prev => 
@@ -313,24 +341,87 @@ export const AddItemDrawer: React.FC<AddItemDrawerProps> = ({
             )}
 
             {imagePreview ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#FFFFFF', padding: '8px', border: '1px solid var(--border-hairline)' }}>
-                <img 
-                  src={imagePreview} 
-                  alt="Garment Preview" 
-                  style={{ width: '60px', height: '75px', objectFit: 'cover' }} 
-                />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink-primary)' }}>Compressed for Fast Mobile Loading</div>
-                  <div style={{ fontSize: '11px', color: 'var(--ink-muted)' }}>Storage weight: ~{imageSizeKb} KB (Zero Cloud Egress)</div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#FFFFFF', padding: '8px', border: '1px solid var(--border-hairline)' }}>
+                  <img 
+                    src={imagePreview} 
+                    alt="Garment Preview" 
+                    style={{ width: '60px', height: '75px', objectFit: 'cover' }} 
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink-primary)' }}>Compressed for Fast Mobile Loading</div>
+                    <div style={{ fontSize: '11px', color: 'var(--ink-muted)' }}>Storage weight: ~{imageSizeKb} KB (Zero Cloud Egress)</div>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => { handleRemoveImage(); setClassificationResult(null); }}
+                    style={{ padding: '6px', color: '#B23A2B', background: 'none', border: 'none', cursor: 'pointer' }}
+                    title="Remove image"
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
-                <button 
-                  type="button" 
-                  onClick={handleRemoveImage}
-                  style={{ padding: '6px', color: '#B23A2B', background: 'none', border: 'none', cursor: 'pointer' }}
-                  title="Remove image"
-                >
-                  <X size={16} />
-                </button>
+
+                {/* On-Demand Photo Analysis Action */}
+                <div style={{ marginTop: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={handleAnalyzePhoto}
+                    disabled={isAnalyzing}
+                    className="btn-editorial-outline"
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      fontSize: '11px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      background: '#FFFFFF'
+                    }}
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <RefreshCw size={13} className="spin-animation" />
+                        <span>Analyzing Weave, Tone & Silhouette...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles size={13} />
+                        <span>Analyze Photo Details (On-Demand Vision)</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Classification Uncertainty & Correction Banner */}
+                {classificationResult && (
+                  <div 
+                    style={{
+                      marginTop: '8px',
+                      padding: '10px',
+                      background: classificationResult.isUncertain ? '#FFF8E1' : '#F1F8E9',
+                      border: `1px solid ${classificationResult.isUncertain ? '#FFE082' : '#C5E1A5'}`,
+                      fontSize: '11px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                      <span style={{ fontWeight: 800, textTransform: 'uppercase', color: classificationResult.isUncertain ? '#F57F17' : '#33691E' }}>
+                        {classificationResult.isUncertain ? '⚠️ Uncertainty Detected' : '✓ Vision Analysis Complete'}
+                      </span>
+                      <span style={{ fontWeight: 800, fontSize: '10px' }}>
+                        Confidence: {classificationResult.confidence}%
+                      </span>
+                    </div>
+                    <p style={{ margin: '0 0 6px 0', color: 'var(--ink-secondary)', lineHeight: 1.4 }}>
+                      Suggested: <strong>{classificationResult.suggestedColorName}</strong> • {classificationResult.suggestedSubcategoryLabel} ({classificationResult.suggestedFabric}).
+                      {classificationResult.notes && ` ${classificationResult.notes}`}
+                    </p>
+                    <div style={{ fontSize: '10px', color: 'var(--ink-muted)', fontStyle: 'italic' }}>
+                      Every field has been pre-filled above. You can correct any value before saving.
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div>

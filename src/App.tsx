@@ -9,6 +9,8 @@ import type { TabType } from './components/common/BottomNav';
 import { HomeFeed } from './components/home/HomeFeed';
 import { WardrobeView } from './components/wardrobe/WardrobeView';
 import { StylistView } from './components/stylist/StylistView';
+import { WardrobeIntelligenceView } from './components/intelligence/WardrobeIntelligenceView';
+import { ShoppingDiscoveryView } from './components/shopping/ShoppingDiscoveryView';
 import { LookbookView } from './components/lookbook/LookbookView';
 import { ProfileView } from './components/profile/ProfileView';
 import { AuthModal } from './components/auth/AuthModal';
@@ -290,6 +292,30 @@ export const App: React.FC = () => {
               excludedColorHexes={excludedHexes}
               savedOutfitIds={userData.lookbook.map(e => e.outfit.id)}
               onSaveOutfit={handleSaveOutfit}
+            />
+          </div>
+        )}
+
+        {activeTab === 'planner' && (
+          <div style={{ maxWidth: '720px', margin: '0 auto', padding: '24px 16px' }}>
+            <WardrobeIntelligenceView
+              wardrobe={userData.wardrobe}
+              userId={userData.userId}
+              savedOutfits={userData.lookbook.map(e => e.outfit)}
+              onIncrementWear={handleIncrementWear}
+              onNavigateToStylist={() => {
+                setActiveTab('stylist');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            />
+          </div>
+        )}
+
+        {activeTab === 'shopping' && (
+          <div style={{ maxWidth: '760px', margin: '0 auto', padding: '24px 16px' }}>
+            <ShoppingDiscoveryView
+              wardrobe={userData.wardrobe}
+              excludedColorHexes={excludedHexes}
             />
           </div>
         )}

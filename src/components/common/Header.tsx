@@ -85,6 +85,18 @@ export const Header: React.FC<HeaderProps> = ({
               AI STYLIST
             </button>
             <button 
+              className={`nav-link-item ${activeTab === 'planner' ? 'active' : ''}`}
+              onClick={() => onNavigate('planner')}
+            >
+              PLANNER
+            </button>
+            <button 
+              className={`nav-link-item ${activeTab === 'shopping' ? 'active' : ''}`}
+              onClick={() => onNavigate('shopping')}
+            >
+              SHOP
+            </button>
+            <button 
               className={`nav-link-item ${activeTab === 'lookbook' ? 'active' : ''}`}
               onClick={() => onNavigate('lookbook')}
             >

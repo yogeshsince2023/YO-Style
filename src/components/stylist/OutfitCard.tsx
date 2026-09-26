@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { WardrobeItem, CuratedOutfit } from '../../types/fashion';
-import { Bookmark, RefreshCw, ArrowRight, ThumbsDown, AlertCircle, X, EyeOff } from 'lucide-react';
+import { Bookmark, RefreshCw, ArrowRight, ThumbsDown, AlertCircle, X, EyeOff, User } from 'lucide-react';
 
 interface OutfitCardProps {
   outfit: CuratedOutfit;
@@ -10,6 +10,7 @@ interface OutfitCardProps {
   onSwapPiece: (outfitId: string, slot: keyof CuratedOutfit['items'], newItem: WardrobeItem) => void;
   onRemoveSlot: (outfitId: string, slot: keyof CuratedOutfit['items']) => void;
   onDislikeOutfit: (outfitId: string) => void;
+  onTryOn?: (outfit: CuratedOutfit) => void;
 }
 
 export const OutfitCard: React.FC<OutfitCardProps> = ({
@@ -19,7 +20,8 @@ export const OutfitCard: React.FC<OutfitCardProps> = ({
   isSaved,
   onSwapPiece,
   onRemoveSlot,
-  onDislikeOutfit
+  onDislikeOutfit,
+  onTryOn
 }) => {
   const [swappingSlot, setSwappingSlot] = useState<keyof CuratedOutfit['items'] | null>(null);
 
@@ -92,6 +94,18 @@ export const OutfitCard: React.FC<OutfitCardProps> = ({
           >
             <ThumbsDown size={13} />
           </button>
+
+          {onTryOn && !outfit.isIncomplete && (
+            <button
+              onClick={() => onTryOn(outfit)}
+              className="btn-editorial-outline"
+              style={{ padding: '6px 10px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}
+              title="Preview on 2D visual avatar"
+            >
+              <User size={12} />
+              <span>TRY ON</span>
+            </button>
+          )}
 
           {!outfit.isIncomplete && (
             <button

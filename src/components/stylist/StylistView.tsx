@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import type { WardrobeItem, OccasionType, WeatherMood, CuratedOutfit, FashionProfile } from '../../types/fashion';
+import type { IndianFestiveEvent } from '../../types/advanced';
 import { generateCuratedOutfits } from '../../utils/styleEngine';
+import { FESTIVE_PROTOCOLS, curateFestiveLook } from '../../utils/advancedStyling';
 import { OutfitCard } from './OutfitCard';
 import { ConversationalStylist } from './ConversationalStylist';
-import { Sparkles, RefreshCw, AlertTriangle, ShieldCheck, MessageSquare, Compass } from 'lucide-react';
+import { PersonalAvatarTryOnModal } from '../advanced/PersonalAvatarTryOnModal';
+import { Sparkles, RefreshCw, AlertTriangle, ShieldCheck, MessageSquare, Compass, Flame } from 'lucide-react';
 
 interface StylistViewProps {
   wardrobe: WardrobeItem[];
@@ -38,9 +41,11 @@ export const StylistView: React.FC<StylistViewProps> = ({
   savedOutfitIds,
   onSaveOutfit
 }) => {
-  const [activeMode, setActiveMode] = useState<'chat' | 'curate'>('chat');
+  const [activeMode, setActiveMode] = useState<'chat' | 'curate' | 'festive'>('chat');
   const [selectedOccasion, setSelectedOccasion] = useState<OccasionType>('festive_indian');
   const [selectedWeather, setSelectedWeather] = useState<WeatherMood>('breezy_evening');
+  const [selectedFestiveEvent, setSelectedFestiveEvent] = useState<IndianFestiveEvent>('mehendi_sangeet');
+  const [tryOnOutfit, setTryOnOutfit] = useState<CuratedOutfit | null>(null);
   const [dislikedIds, setDislikedIds] = useState<string[]>([]);
   const [isCurating, setIsCurating] = useState(false);
 
@@ -122,8 +127,8 @@ export const StylistView: React.FC<StylistViewProps> = ({
       <div 
         style={{ 
           display: 'grid', 
-          gridTemplateColumns: '1fr 1fr', 
-          gap: '8px', 
+          gridTemplateColumns: '1fr 1fr 1fr', 
+          gap: '6px', 
           marginBottom: '20px',
           background: 'var(--bg-warm-light)',
           padding: '4px',
@@ -134,44 +139,66 @@ export const StylistView: React.FC<StylistViewProps> = ({
           id="tab-stylist-chat"
           onClick={() => setActiveMode('chat')}
           style={{
-            padding: '10px 14px',
+            padding: '10px 8px',
             border: activeMode === 'chat' ? '1px solid var(--ink-primary)' : '1px solid transparent',
             background: activeMode === 'chat' ? '#FFFFFF' : 'transparent',
             fontWeight: activeMode === 'chat' ? 800 : 600,
-            fontSize: '12px',
+            fontSize: '11px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '8px',
+            gap: '6px',
             color: 'var(--ink-primary)',
             transition: 'all 0.15s ease'
           }}
         >
-          <MessageSquare size={14} />
-          <span>Interactive Chat</span>
+          <MessageSquare size={13} />
+          <span>AI Chat</span>
         </button>
 
         <button
           id="tab-stylist-curate"
           onClick={() => setActiveMode('curate')}
           style={{
-            padding: '10px 14px',
+            padding: '10px 8px',
             border: activeMode === 'curate' ? '1px solid var(--ink-primary)' : '1px solid transparent',
             background: activeMode === 'curate' ? '#FFFFFF' : 'transparent',
             fontWeight: activeMode === 'curate' ? 800 : 600,
-            fontSize: '12px',
+            fontSize: '11px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '8px',
+            gap: '6px',
             color: 'var(--ink-primary)',
             transition: 'all 0.15s ease'
           }}
         >
-          <Compass size={14} />
+          <Compass size={13} />
           <span>Occasion Curate</span>
+        </button>
+
+        <button
+          id="tab-stylist-festive"
+          onClick={() => setActiveMode('festive')}
+          style={{
+            padding: '10px 8px',
+            border: activeMode === 'festive' ? '1px solid var(--ink-primary)' : '1px solid transparent',
+            background: activeMode === 'festive' ? '#FFFFFF' : 'transparent',
+            fontWeight: activeMode === 'festive' ? 800 : 600,
+            fontSize: '11px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            color: 'var(--ink-primary)',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          <Flame size={13} />
+          <span>Indian Events</span>
         </button>
       </div>
 
@@ -298,12 +325,101 @@ export const StylistView: React.FC<StylistViewProps> = ({
                   onSwapPiece={handleSwapPiece}
                   onRemoveSlot={handleRemoveSlot}
                   onDislikeOutfit={handleDislikeOutfit}
+                  onTryOn={setTryOnOutfit}
                 />
               ))
             )}
           </div>
         </div>
       )}
+
+      {/* View Mode 3: Indian Weddings & Festivals */}
+      {activeMode === 'festive' && (() => {
+        const festiveOutfit = curateFestiveLook(selectedFestiveEvent, wardrobe);
+        const protocol = FESTIVE_PROTOCOLS[selectedFestiveEvent];
+
+        return (
+          <div>
+            {/* Event Protocol Selector */}
+            <div className="editorial-card" style={{ padding: '16px', marginBottom: '16px' }}>
+              <label className="form-label" style={{ marginBottom: '10px' }}>Select Ceremony / Celebration</label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                {(Object.keys(FESTIVE_PROTOCOLS) as IndianFestiveEvent[]).map(evKey => {
+                  const isSel = selectedFestiveEvent === evKey;
+                  const proto = FESTIVE_PROTOCOLS[evKey];
+                  return (
+                    <button
+                      key={evKey}
+                      type="button"
+                      onClick={() => setSelectedFestiveEvent(evKey)}
+                      style={{
+                        padding: '10px',
+                        border: isSel ? '2px solid var(--ink-primary)' : '1px solid var(--border-hairline)',
+                        background: isSel ? '#FFFFFF' : 'var(--bg-warm-light)',
+                        textAlign: 'left',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <div style={{ fontSize: '12px', fontWeight: isSel ? 800 : 600 }}>{proto.eventLabel}</div>
+                      <div style={{ fontSize: '10px', color: 'var(--ink-secondary)', marginTop: '2px' }}>
+                        {proto.idealColors.slice(0, 2).join(', ')}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Protocol Styling Guidance */}
+              <div style={{ marginTop: '14px', background: '#FDFBF7', border: '1px solid var(--border-hairline)', padding: '12px', fontSize: '12px' }}>
+                <div style={{ fontWeight: 800, textTransform: 'uppercase', marginBottom: '4px', fontSize: '11px' }}>
+                  Ceremony Etiquette & Fabric Advice:
+                </div>
+                <ul style={{ margin: '0 0 0 16px', padding: 0, color: 'var(--ink-secondary)', lineHeight: 1.5 }}>
+                  {protocol.etiquetteTips.map((tip, idx) => (
+                    <li key={idx}>{tip}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Curated Festive Look */}
+            {festiveOutfit ? (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <h3 style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    Curated Ensemble from Your Closet
+                  </h3>
+                  <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--ink-secondary)' }}>
+                    Ceremony Appropriate
+                  </span>
+                </div>
+
+                <OutfitCard
+                  outfit={festiveOutfit}
+                  wardrobe={wardrobe}
+                  onSaveOutfit={onSaveOutfit}
+                  isSaved={savedOutfitIds.includes(festiveOutfit.id)}
+                  onSwapPiece={handleSwapPiece}
+                  onRemoveSlot={handleRemoveSlot}
+                  onDislikeOutfit={handleDislikeOutfit}
+                  onTryOn={setTryOnOutfit}
+                />
+              </div>
+            ) : (
+              <div className="editorial-card" style={{ textAlign: 'center', padding: '30px', color: 'var(--ink-secondary)', fontSize: '12px' }}>
+                Your wardrobe currently lacks festive tops or kurtas. Consider cataloging an artisanal kurta to complete this ceremony capsule.
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* Experimental 2D Visual Try-On Modal */}
+      <PersonalAvatarTryOnModal
+        outfit={tryOnOutfit}
+        onClose={() => setTryOnOutfit(null)}
+        defaultFit={profile.preferredFits?.[0] || 'relaxed'}
+      />
     </div>
   );
 };

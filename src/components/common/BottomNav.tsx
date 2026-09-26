@@ -1,7 +1,7 @@
 import React from 'react';
-import { Home, Shirt, Sparkles, Bookmark, User } from 'lucide-react';
+import { Home, Shirt, Sparkles, CalendarDays, ShoppingBag, Bookmark, User } from 'lucide-react';
 
-export type TabType = 'home' | 'wardrobe' | 'stylist' | 'lookbook' | 'profile';
+export type TabType = 'home' | 'wardrobe' | 'stylist' | 'planner' | 'shopping' | 'lookbook' | 'profile';
 
 interface BottomNavProps {
   activeTab: TabType;
@@ -13,6 +13,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) 
     { id: 'home' as TabType, label: 'Feed', icon: Home },
     { id: 'wardrobe' as TabType, label: 'Closet', icon: Shirt },
     { id: 'stylist' as TabType, label: 'Style Me', icon: Sparkles },
+    { id: 'planner' as TabType, label: 'Planner', icon: CalendarDays },
+    { id: 'shopping' as TabType, label: 'Shop', icon: ShoppingBag },
     { id: 'lookbook' as TabType, label: 'Lookbook', icon: Bookmark },
     { id: 'profile' as TabType, label: 'Style DNA', icon: User },
   ];
