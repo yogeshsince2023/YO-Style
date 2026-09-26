@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import type { ExtendedFashionProfile } from '../../types/auth';
 import { User, Shield, Download, Trash2, Check, RefreshCw, Sliders, Tag, Palette } from 'lucide-react';
 
+import type { WardrobeItem } from '../../types/fashion';
+
 interface ProfileViewProps {
   profile: ExtendedFashionProfile;
+  wardrobe: WardrobeItem[];
   onUpdateProfile: (updated: ExtendedFashionProfile) => void;
   onResetToDemo: () => void;
   onWipeData: () => void;
@@ -15,6 +18,7 @@ interface ProfileViewProps {
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
   profile,
+  wardrobe,
   onUpdateProfile,
   onResetToDemo,
   onWipeData,
@@ -304,6 +308,31 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           )}
         </button>
       </form>
+
+      {/* Live Storage Usage Monitor */}
+      <div className="editorial-card" style={{ padding: '16px', background: '#FFFFFF', marginBottom: '18px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+          <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            Vault Storage & Media Capacity
+          </span>
+          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--ink-primary)' }}>
+            {Math.round(wardrobe.reduce((acc, curr) => acc + (curr.imageSizeKb || 2), 15))} KB of ~10 MB
+          </span>
+        </div>
+
+        <div style={{ width: '100%', height: '6px', background: 'var(--bg-muted-gray)', borderRadius: '2px', overflow: 'hidden' }}>
+          <div 
+            style={{ 
+              width: `${Math.min(100, Math.max(3, (wardrobe.reduce((acc, curr) => acc + (curr.imageSizeKb || 2), 15) / 10240) * 100))}%`, 
+              height: '100%', 
+              background: 'var(--ink-primary)' 
+            }} 
+          />
+        </div>
+        <p style={{ fontSize: '10px', color: 'var(--ink-muted)', marginTop: '6px' }}>
+          {wardrobe.filter(w => !!w.imageUrl).length} compressed images stored. Client compression maintains ~60KB per image, allowing 150+ full-look photos with zero cloud server costs.
+        </p>
+      </div>
 
       {/* Privacy & Sovereignty Controls */}
       <div className="editorial-card" style={{ padding: '20px', background: 'var(--bg-warm-light)' }}>

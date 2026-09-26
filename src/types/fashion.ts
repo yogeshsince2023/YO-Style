@@ -35,6 +35,8 @@ export type WeatherMood = 'warm_sun' | 'breezy_evening' | 'chilly_winter' | 'mon
 
 export type FitType = 'slim' | 'tailored' | 'regular' | 'relaxed' | 'oversized';
 
+export type PatternType = 'solid' | 'handblock' | 'striped' | 'checked' | 'textured' | 'floral' | 'geometric';
+
 export interface WardrobeItem {
   id: string;
   name: string;
@@ -44,11 +46,14 @@ export interface WardrobeItem {
   primaryColor: string; // e.g. '#264653'
   colorName: string; // e.g. 'Malabar Indigo'
   secondaryColor?: string;
+  pattern?: PatternType;
   fabric: string; // Cotton, Mulberry Silk, Irish Linen, Khadi, Denim, Wool
   fit: FitType;
+  brand?: string; // Optional user-entered brand
   occasions: OccasionType[];
   seasons: ('summer' | 'monsoon' | 'winter' | 'all_year')[];
-  imageUrl?: string;
+  imageUrl?: string; // Compressed client WebP/JPEG base64
+  imageSizeKb?: number; // File size in KB for storage monitoring
   isAvailable: boolean; // false if in laundry or archived
   wearCount: number;
   lastWornDate?: string;
@@ -79,6 +84,14 @@ export interface FashionProfile {
   };
 }
 
+export interface MissingWardrobeSlot {
+  slot: 'top' | 'bottom' | 'footwear' | 'layer';
+  requiredCategory: string;
+  suggestedStyle: string;
+  suggestedColor: string;
+  reason: string;
+}
+
 export interface CuratedOutfit {
   id: string;
   title: string;
@@ -92,6 +105,8 @@ export interface CuratedOutfit {
     footwear?: WardrobeItem;
     accessory?: WardrobeItem;
   };
+  isIncomplete?: boolean;
+  missingSlots?: MissingWardrobeSlot[];
   stylingRationale: string;
   harmonyTips: string[];
   colorHarmonyScore: number; // 0-100
@@ -100,10 +115,11 @@ export interface CuratedOutfit {
     suggestedColor: string;
     potentialOutfitsUnlocked: number;
     reasoning: string;
-    isDemoOnly: true;
+    isDemoOnly?: boolean;
   };
   savedAt?: number;
   userRating?: 'loved' | 'neutral' | 'disliked';
+  isDisliked?: boolean;
 }
 
 export interface LookbookEntry {

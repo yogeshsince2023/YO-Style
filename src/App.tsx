@@ -272,6 +272,11 @@ export const App: React.FC = () => {
               onDeleteItem={handleDeleteItem}
               onToggleAvailability={handleToggleAvailability}
               onIncrementWear={handleIncrementWear}
+              onUpdateItem={(updatedItem) => {
+                const updatedWardrobe = userData.wardrobe.map(i => i.id === updatedItem.id ? updatedItem : i);
+                persistContainer({ ...userData, wardrobe: updatedWardrobe });
+                showToast(`Updated "${updatedItem.name}"`);
+              }}
             />
           </div>
         )}
@@ -280,6 +285,8 @@ export const App: React.FC = () => {
           <div style={{ maxWidth: '720px', margin: '0 auto', padding: '24px 16px' }}>
             <StylistView
               wardrobe={userData.wardrobe}
+              profile={userData.profile as any}
+              userId={userData.userId}
               excludedColorHexes={excludedHexes}
               savedOutfitIds={userData.lookbook.map(e => e.outfit.id)}
               onSaveOutfit={handleSaveOutfit}
@@ -301,6 +308,7 @@ export const App: React.FC = () => {
           <div style={{ maxWidth: '640px', margin: '0 auto', padding: '24px 16px' }}>
             <ProfileView
               profile={userData.profile}
+              wardrobe={userData.wardrobe}
               onUpdateProfile={handleUpdateProfile}
               onResetToDemo={handleResetToDemo}
               onWipeData={handleWipeData}

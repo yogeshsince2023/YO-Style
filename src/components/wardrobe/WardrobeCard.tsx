@@ -1,6 +1,6 @@
 import React from 'react';
 import type { WardrobeItem } from '../../types/fashion';
-import { Sparkles, Shirt } from 'lucide-react';
+import { Shirt } from 'lucide-react';
 
 interface WardrobeCardProps {
   item: WardrobeItem;
@@ -10,82 +10,101 @@ interface WardrobeCardProps {
 export const WardrobeCard: React.FC<WardrobeCardProps> = ({ item, onClick }) => {
   return (
     <article 
-      className="editorial-card"
-      style={{
-        padding: '12px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        cursor: 'pointer',
-        transition: 'transform 0.15s ease, box-shadow 0.15s ease'
-      }}
+      className="showcase-product-card"
       onClick={() => onClick(item)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick(item); }}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        cursor: 'pointer',
+        border: '1px solid var(--border-hairline)',
+        backgroundColor: '#FFFFFF',
+        position: 'relative'
+      }}
     >
       <div>
-        {/* Top visual representation */}
+        {/* Top Photographic Area or Minimalist Color Block */}
         <div 
+          className="showcase-card-img-wrap"
           style={{
-            height: '110px',
-            borderRadius: 'var(--radius-sm)',
-            backgroundColor: 'var(--bg-secondary)',
+            aspectRatio: '3 / 4',
+            backgroundColor: '#F2F2F2',
+            position: 'relative',
+            overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: '10px',
-            position: 'relative',
-            overflow: 'hidden'
+            justifyContent: 'center'
           }}
         >
-          {/* Subtle Color Accent Border Top */}
-          <div 
+          {item.imageUrl ? (
+            <img 
+              src={item.imageUrl} 
+              alt={item.name} 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              loading="lazy" 
+            />
+          ) : (
+            <div style={{ textAlign: 'center', padding: '12px' }}>
+              <div 
+                style={{
+                  width: '54px',
+                  height: '54px',
+                  borderRadius: '50%',
+                  backgroundColor: item.primaryColor,
+                  margin: '0 auto 8px auto',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '2px solid #FFFFFF'
+                }}
+              >
+                <Shirt 
+                  size={24} 
+                  color={item.primaryColor === '#FFFFFF' || item.primaryColor === '#E5DFD3' ? '#1C1A18' : '#FAF8F5'} 
+                />
+              </div>
+              <span style={{ fontSize: '11px', color: 'var(--ink-secondary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {item.colorName}
+              </span>
+            </div>
+          )}
+
+          {/* Top Left Category Pill */}
+          <span 
             style={{
               position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: '4px',
-              backgroundColor: item.primaryColor
+              top: '8px',
+              left: '8px',
+              fontSize: '9px',
+              fontWeight: 800,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              padding: '2px 6px',
+              backgroundColor: '#000000',
+              color: '#FFFFFF'
             }}
-          />
+          >
+            {item.category}
+          </span>
 
-          <div style={{ textAlign: 'center', padding: '8px' }}>
-            <div 
-              style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '50%',
-                backgroundColor: item.primaryColor,
-                margin: '0 auto 6px auto',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <Shirt 
-                size={20} 
-                color={item.primaryColor === '#FFFFFF' || item.primaryColor === '#E5DFD3' ? '#1C1A18' : '#FAF8F5'} 
-              />
-            </div>
-            <span style={{ fontSize: '11px', color: 'var(--ink-secondary)', fontWeight: 600 }}>
-              {item.colorName}
-            </span>
-          </div>
-
+          {/* Laundry Indicator */}
           {!item.isAvailable && (
             <span 
               style={{
                 position: 'absolute',
-                bottom: '6px',
-                left: '6px',
-                fontSize: '10px',
-                backgroundColor: 'rgba(0,0,0,0.7)',
+                top: '8px',
+                right: '8px',
+                fontSize: '9px',
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                backgroundColor: 'rgba(178,58,43,0.92)',
                 color: '#fff',
-                padding: '2px 6px',
-                borderRadius: '4px'
+                padding: '2px 6px'
               }}
             >
               In Laundry
@@ -93,53 +112,49 @@ export const WardrobeCard: React.FC<WardrobeCardProps> = ({ item, onClick }) => 
           )}
         </div>
 
-        {/* Category & Name */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-          <span 
-            style={{
-              fontSize: '10px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              fontWeight: 700,
-              color: 'var(--accent-ochre)'
+        {/* Card Details */}
+        <div style={{ padding: '12px' }}>
+          <div style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-secondary)' }}>
+            {item.fabric} • {item.fit} cut
+          </div>
+
+          <h3 
+            style={{ 
+              fontSize: '13px', 
+              fontWeight: 700, 
+              color: 'var(--ink-primary)', 
+              marginTop: '3px',
+              lineHeight: 1.35
             }}
           >
-            {item.category}
-          </span>
-          <span style={{ color: 'var(--border-strong)' }}>•</span>
-          <span style={{ fontSize: '11px', color: 'var(--ink-muted)' }}>{item.fabric}</span>
-        </div>
+            {item.name}
+          </h3>
 
-        <h3 
-          style={{ 
-            fontSize: '14px', 
-            fontWeight: 600, 
-            lineHeight: 1.3,
-            marginBottom: '6px',
-            fontFamily: 'var(--font-sans)',
-            color: 'var(--ink-primary)'
-          }}
-        >
-          {item.name}
-        </h3>
+          {item.brand && (
+            <div style={{ fontSize: '11px', color: 'var(--ink-muted)', marginTop: '2px' }}>
+              {item.brand}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid var(--border-subtle)' }}>
-        <span style={{ fontSize: '11px', color: 'var(--ink-muted)', textTransform: 'capitalize' }}>
-          {item.fit} cut
+      {/* Footer Info: Pattern & Wear Counter */}
+      <div 
+        style={{ 
+          padding: '8px 12px', 
+          borderTop: '1px solid var(--border-hairline)', 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          fontSize: '11px',
+          color: 'var(--ink-muted)'
+        }}
+      >
+        <span style={{ textTransform: 'capitalize' }}>
+          {item.pattern || 'Solid'}
         </span>
-
-        <span 
-          style={{ 
-            fontSize: '11px', 
-            color: 'var(--accent-moss)', 
-            fontWeight: 600,
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '3px' 
-          }}
-        >
-          <Sparkles size={11} /> Worn {item.wearCount}x
+        <span style={{ fontWeight: 700, color: 'var(--ink-primary)' }}>
+          Worn {item.wearCount}x
         </span>
       </div>
     </article>
