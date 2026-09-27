@@ -378,29 +378,10 @@ export const App: React.FC = () => {
         }}
       />
 
-      {/* Global Minimalist Toast */}
+      {/* Global Showroom Toast */}
       {toastMessage && (
-        <div 
-          style={{
-            position: 'fixed',
-            bottom: '76px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: 'var(--bg-dark)',
-            color: 'var(--ink-inverse)',
-            padding: '8px 18px',
-            fontSize: '11px',
-            fontWeight: 700,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            zIndex: 999,
-            border: '1px solid rgba(255,255,255,0.2)'
-          }}
-        >
-          <CheckCircle2 size={14} color="#FFFFFF" />
+        <div className="showroom-toast">
+          <CheckCircle2 size={14} color="#C8FF00" />
           <span>{toastMessage}</span>
         </div>
       )}

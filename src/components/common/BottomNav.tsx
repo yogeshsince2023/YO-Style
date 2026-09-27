@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Shirt, Sparkles, CalendarDays, ShoppingBag, Bookmark, User } from 'lucide-react';
+import { Home, Shirt, Sparkles, CalendarDays, User } from 'lucide-react';
 
 export type TabType = 'home' | 'wardrobe' | 'stylist' | 'planner' | 'shopping' | 'lookbook' | 'profile';
 
@@ -10,13 +10,11 @@ interface BottomNavProps {
 
 export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) => {
   const tabs = [
-    { id: 'home' as TabType, label: 'Feed', icon: Home },
+    { id: 'home' as TabType, label: 'Home', icon: Home },
     { id: 'wardrobe' as TabType, label: 'Closet', icon: Shirt },
-    { id: 'stylist' as TabType, label: 'Style Me', icon: Sparkles },
-    { id: 'planner' as TabType, label: 'Planner', icon: CalendarDays },
-    { id: 'shopping' as TabType, label: 'Shop', icon: ShoppingBag },
-    { id: 'lookbook' as TabType, label: 'Lookbook', icon: Bookmark },
-    { id: 'profile' as TabType, label: 'Style DNA', icon: User },
+    { id: 'stylist' as TabType, label: 'Style', icon: Sparkles },
+    { id: 'planner' as TabType, label: 'Plan', icon: CalendarDays },
+    { id: 'profile' as TabType, label: 'Profile', icon: User },
   ];
 
   return (
@@ -33,7 +31,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) 
             aria-selected={isActive}
             role="tab"
           >
-            <Icon size={20} className="nav-icon" />
+            <Icon size={20} />
             <span className="nav-label">{tab.label}</span>
           </button>
         );

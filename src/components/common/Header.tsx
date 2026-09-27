@@ -1,3 +1,4 @@
+import React from 'react';
 import { Search, Bookmark, LogIn, UserCheck } from 'lucide-react';
 import type { TabType } from './BottomNav';
 import type { UserAccount } from '../../types/auth';
@@ -17,137 +18,80 @@ export const Header: React.FC<HeaderProps> = ({
   currentUser,
   onOpenAuth
 }) => {
+  const navItems: { id: TabType; label: string }[] = [
+    { id: 'home', label: 'Home' },
+    { id: 'wardrobe', label: 'Closet' },
+    { id: 'stylist', label: 'Stylist' },
+    { id: 'planner', label: 'Planner' },
+    { id: 'shopping', label: 'Shop' },
+    { id: 'lookbook', label: 'Lookbook' },
+    { id: 'profile', label: 'Profile' },
+  ];
+
   return (
-    <>
-      {/* Top Gazette Micro Notice Bar */}
-      <div className="top-notice-bar">
-        <span>
-          {currentUser 
-            ? `PRIVATE VAULT ACTIVE: ${currentUser.name.toUpperCase()} • STRICT PER-USER DATA ISOLATION` 
-            : `GUEST PREVIEW MODE • PRIVATE LOCAL STORAGE • ZERO ADS`}
-        </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <span>{wardrobeCount} PIECES IN CLOSET</span>
-          {!currentUser && (
-            <button 
-              onClick={onOpenAuth}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#FFFFFF',
-                fontSize: '10px',
-                fontWeight: 800,
-                letterSpacing: '0.12em',
-                textDecoration: 'underline',
-                cursor: 'pointer'
-              }}
-            >
-              SIGN IN / REGISTER →
-            </button>
-          )}
+    <header className="showroom-header">
+      {/* Brand */}
+      <div 
+        className="showroom-brand" 
+        onClick={() => onNavigate('home')}
+      >
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="showroom-brand-dot" />
+            <span>YO Style</span>
+          </div>
+          <div className="showroom-brand-sub">
+            Know your style. Wear it better.
+          </div>
         </div>
       </div>
 
-      {/* Main Luxury Masthead Header */}
-      <header className="gazu-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          <div>
-            <div 
-              className="brand-masthead" 
-              onClick={() => onNavigate('home')}
-              style={{ cursor: 'pointer', lineHeight: 1 }}
-            >
-              YO STYLE
-            </div>
-            <div style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ink-secondary)', marginTop: '3px' }}>
-              Know your style. Wear it better.
-            </div>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="nav-links-row">
-            <button 
-              className={`nav-link-item ${activeTab === 'home' ? 'active' : ''}`}
-              onClick={() => onNavigate('home')}
-            >
-              EDITORIAL
-            </button>
-            <button 
-              className={`nav-link-item ${activeTab === 'wardrobe' ? 'active' : ''}`}
-              onClick={() => onNavigate('wardrobe')}
-            >
-              CLOSET
-            </button>
-            <button 
-              className={`nav-link-item ${activeTab === 'stylist' ? 'active' : ''}`}
-              onClick={() => onNavigate('stylist')}
-            >
-              AI STYLIST
-            </button>
-            <button 
-              className={`nav-link-item ${activeTab === 'planner' ? 'active' : ''}`}
-              onClick={() => onNavigate('planner')}
-            >
-              PLANNER
-            </button>
-            <button 
-              className={`nav-link-item ${activeTab === 'shopping' ? 'active' : ''}`}
-              onClick={() => onNavigate('shopping')}
-            >
-              SHOP
-            </button>
-            <button 
-              className={`nav-link-item ${activeTab === 'lookbook' ? 'active' : ''}`}
-              onClick={() => onNavigate('lookbook')}
-            >
-              LOOKBOOK
-            </button>
-            <button 
-              className={`nav-link-item ${activeTab === 'profile' ? 'active' : ''}`}
-              onClick={() => onNavigate('profile')}
-            >
-              STYLE DNA
-            </button>
-          </nav>
-        </div>
-
-        {/* Right Action Icons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button 
-            onClick={() => onNavigate('wardrobe')}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em' }}
-            title="Search Closet"
+      {/* Desktop Navigation */}
+      <nav className="showroom-nav">
+        {navItems.map(item => (
+          <button
+            key={item.id}
+            className={`showroom-nav-link ${activeTab === item.id ? 'active' : ''}`}
+            onClick={() => onNavigate(item.id)}
           >
-            <Search size={16} />
-            <span className="hidden-mobile">SEARCH</span>
+            {item.label}
           </button>
-          
-          <button 
-            onClick={() => {
-              if (currentUser) {
-                onNavigate('profile');
-              } else {
-                onOpenAuth();
-              }
-            }}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em' }}
-            title={currentUser ? `Signed in as ${currentUser.name}` : "Sign In / Register"}
-          >
-            {currentUser ? <UserCheck size={16} /> : <LogIn size={16} />}
-            <span className="hidden-mobile">
-              {currentUser ? currentUser.name.split(' ')[0].toUpperCase() : 'SIGN IN'}
-            </span>
-          </button>
+        ))}
+      </nav>
 
-          <button 
-            onClick={() => onNavigate('lookbook')}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em' }}
-            title="Saved Outfits"
-          >
-            <Bookmark size={16} />
-          </button>
-        </div>
-      </header>
-    </>
+      {/* Right Actions */}
+      <div className="showroom-header-actions">
+        <button
+          className="showroom-icon-btn"
+          onClick={() => onNavigate('wardrobe')}
+          title={`Search Closet (${wardrobeCount} pieces)`}
+        >
+          <Search size={16} />
+        </button>
+
+        <button
+          className="showroom-icon-btn"
+          onClick={() => onNavigate('lookbook')}
+          title="Saved Outfits"
+        >
+          <Bookmark size={16} />
+        </button>
+
+        <button
+          className="showroom-icon-btn"
+          onClick={() => {
+            if (currentUser) {
+              onNavigate('profile');
+            } else {
+              onOpenAuth();
+            }
+          }}
+          title={currentUser ? `Signed in as ${currentUser.name}` : 'Sign In'}
+          style={currentUser ? { background: 'var(--accent-lime)', borderColor: 'var(--accent-lime)' } : {}}
+        >
+          {currentUser ? <UserCheck size={16} /> : <LogIn size={16} />}
+        </button>
+      </div>
+    </header>
   );
 };
